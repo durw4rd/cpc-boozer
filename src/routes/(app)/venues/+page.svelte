@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { pending, withPending } from '$lib/pending';
 
 	let { data, form } = $props();
 
@@ -26,7 +27,7 @@
 
 	<section class="rounded-xl border border-white/10 bg-black/60 p-4 backdrop-blur-sm">
 		<h2 class="mb-3 text-xs font-semibold uppercase tracking-widest text-white/40">add venue</h2>
-		<form method="POST" action="?/add" use:enhance class="space-y-2">
+		<form method="POST" action="?/add" use:enhance={withPending} class="space-y-2">
 			<input type="text" name="name" placeholder="name" required class="{inputClass} py-2.5" />
 			<input type="text" name="description" placeholder="description (optional)" class="{inputClass} py-2.5" />
 			<input type="url" name="url" placeholder="website / menu URL (optional)" class="{inputClass} py-2.5" />
@@ -46,7 +47,17 @@
 			{#each data.venues as venue}
 				<li class="rounded-xl border border-white/10 bg-black/60 p-4 backdrop-blur-sm">
 					{#if editingId === venue.id}
-						<form method="POST" action="?/edit" use:enhance={() => async ({ update }) => { await update(); editingId = null; }} class="space-y-2">
+						<form method="POST" action="?/edit" use:enhance={() => {
+							pending.set(true);
+							return async ({ update }) => {
+								try {
+									await update();
+									editingId = null;
+								} finally {
+									pending.set(false);
+								}
+							};
+						}} class="space-y-2">
 							<input type="hidden" name="id" value={venue.id} />
 							<input type="text" name="name" bind:value={editName} required class={inputClass} />
 							<input type="text" name="description" bind:value={editDescription} placeholder="description (optional)" class={inputClass} />

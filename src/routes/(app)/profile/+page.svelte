@@ -1,5 +1,6 @@
 <script>
 	import { enhance } from '$app/forms';
+	import { withPending } from '$lib/pending';
 
 	let { data, form } = $props();
 
@@ -14,7 +15,7 @@
 
 	<section class="rounded-xl border border-white/10 bg-black/60 p-4 backdrop-blur-sm">
 		<h2 class="mb-3 text-xs font-semibold uppercase tracking-widest text-white/40">change name</h2>
-		<form method="POST" action="?/changeName" use:enhance class="space-y-2">
+		<form method="POST" action="?/changeName" use:enhance={withPending} class="space-y-2">
 			<input type="text" name="name" value={data.user.name} required class={inputClass} />
 			{#if form?.nameError}
 				<p class="text-xs text-red-400">{form.nameError}</p>
@@ -28,7 +29,7 @@
 
 	<section class="rounded-xl border border-white/10 bg-black/60 p-4 backdrop-blur-sm">
 		<h2 class="mb-3 text-xs font-semibold uppercase tracking-widest text-white/40">change password</h2>
-		<form method="POST" action="?/changePassword" use:enhance class="space-y-2">
+		<form method="POST" action="?/changePassword" use:enhance={withPending} class="space-y-2">
 			<input type="password" name="current" placeholder="current password" required class={inputClass} />
 			<input type="password" name="next" placeholder="new password" required class={inputClass} />
 			{#if form?.passwordError}

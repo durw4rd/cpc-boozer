@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { onMount } from 'svelte';
 	import { formatEventDate } from '$lib/utils';
+	import { pending, withPending } from '$lib/pending';
 
 	let { data } = $props();
 
@@ -103,7 +104,7 @@
 
 		<!-- Toggle for current user -->
 		<div class="mb-4 flex gap-2">
-			<form method="POST" action="?/toggleAttendance" use:enhance class="flex-1">
+			<form method="POST" action="?/toggleAttendance" use:enhance={withPending} class="flex-1">
 				<input type="hidden" name="eventId" value={data.event.id} />
 				<input type="hidden" name="attending" value="true" />
 				<button
@@ -117,7 +118,7 @@
 					I'm in
 				</button>
 			</form>
-			<form method="POST" action="?/toggleAttendance" use:enhance class="flex-1">
+			<form method="POST" action="?/toggleAttendance" use:enhance={withPending} class="flex-1">
 				<input type="hidden" name="eventId" value={data.event.id} />
 				<input type="hidden" name="attending" value="false" />
 				<button
@@ -166,7 +167,7 @@
 			<div class="mb-4 flex items-center gap-2">
 				<span class="text-sm font-medium text-orange-400">{data.lockedVenue.name}</span>
 				<span class="rounded bg-amber-400/10 px-1.5 py-0.5 text-xs text-orange-400">locked</span>
-				<form method="POST" action="?/unlockVenue" use:enhance class="ml-auto">
+				<form method="POST" action="?/unlockVenue" use:enhance={withPending} class="ml-auto">
 					<input type="hidden" name="eventId" value={data.event.id} />
 					<button class="text-xs text-zinc-600 hover:text-zinc-400">unlock</button>
 				</form>
@@ -223,10 +224,15 @@
 					method="POST"
 					action="?/saveOrder"
 					use:enhance={() => {
+						pending.set(true);
 						savingOrder = true;
 						return async ({ update }) => {
-							await update();
-							savingOrder = false;
+							try {
+								await update();
+							} finally {
+								savingOrder = false;
+								pending.set(false);
+							}
 						};
 					}}
 					class="mb-4 space-y-2"
@@ -265,7 +271,7 @@
 				</form>
 
 				{#if data.currentUserOrder}
-					<form method="POST" action="?/clearOrder" use:enhance class="mt-1">
+					<form method="POST" action="?/clearOrder" use:enhance={withPending} class="mt-1">
 						<input type="hidden" name="eventId" value={data.event.id} />
 						<button class="w-full text-center text-xs text-zinc-600 hover:text-zinc-400">
 							remove my order
@@ -278,10 +284,15 @@
 					method="POST"
 					action="?/saveOrder"
 					use:enhance={() => {
+						pending.set(true);
 						savingOrder = true;
 						return async ({ update }) => {
-							await update();
-							savingOrder = false;
+							try {
+								await update();
+							} finally {
+								savingOrder = false;
+								pending.set(false);
+							}
 						};
 					}}
 					class="mb-4 flex gap-2"
@@ -354,7 +365,7 @@
 							</div>
 							<!-- Actions -->
 							<div class="flex gap-2">
-								<form method="POST" action="?/voteVenue" use:enhance class="flex-1">
+								<form method="POST" action="?/voteVenue" use:enhance={withPending} class="flex-1">
 									<input type="hidden" name="eventId" value={data.event.id} />
 									<input type="hidden" name="venueId" value={venue.id} />
 									<button
@@ -369,7 +380,7 @@
 									</button>
 								</form>
 								{#if venue.voteCount > 0}
-									<form method="POST" action="?/lockVenue" use:enhance>
+									<form method="POST" action="?/lockVenue" use:enhance={withPending}>
 										<input type="hidden" name="eventId" value={data.event.id} />
 										<input type="hidden" name="venueId" value={venue.id} />
 										<button

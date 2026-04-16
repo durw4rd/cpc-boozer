@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { formatEventDate } from '$lib/utils';
 	import { page } from '$app/state';
+	import { withPending } from '$lib/pending';
 
 	let { data } = $props();
 
@@ -49,7 +50,7 @@
 						<div>
 							<p class="mb-2 text-xs font-semibold uppercase tracking-widest text-white/40">attendance</p>
 							<div class="mb-3 flex gap-2">
-								<form method="POST" action="?/toggleAttendance" use:enhance class="flex-1">
+								<form method="POST" action="?/toggleAttendance" use:enhance={withPending} class="flex-1">
 									<input type="hidden" name="eventId" value={event.id} />
 									<input type="hidden" name="attending" value="true" />
 									<button class={[
@@ -59,7 +60,7 @@
 											: 'bg-white/10 text-white/50 hover:bg-white/15'
 									].join(' ')}>I was there</button>
 								</form>
-								<form method="POST" action="?/toggleAttendance" use:enhance class="flex-1">
+								<form method="POST" action="?/toggleAttendance" use:enhance={withPending} class="flex-1">
 									<input type="hidden" name="eventId" value={event.id} />
 									<input type="hidden" name="attending" value="false" />
 									<button class={[

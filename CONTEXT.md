@@ -120,6 +120,8 @@ Login/register/logout are **outside** the `(app)` group and have no auth guard.
 
 All forms use `use:enhance` from `$app/forms` for non-reload submissions.
 
+A global loading indicator (`src/lib/pending.ts`) shows a 2px red sweep bar at the top of the viewport during any form submission or page navigation. The `pending` writable store is set/cleared by each `use:enhance` callback; the `(app)` layout reads `$pending || navigating` to drive the bar.
+
 ---
 
 ## Visual Identity
@@ -138,28 +140,17 @@ The logo PNG is used as:
 
 ---
 
-## Pie-nong Thai Menu Integration — IN PROGRESS
+## Pie-nong Thai Menu Integration — COMPLETE
 
-This feature is **partially implemented**. Schema is in place and pushed; the UI is not yet built.
+Schema, seed, server logic, and UI are all implemented and working.
 
-### What's done
-- `venue_menu_items` table in schema — pushed to Neon
-- `food_orders.menu_item_id` and `food_orders.notes` columns — pushed to Neon
-- Seed script at `scripts/seed-menu.ts` — contains the full menu JSON for Pie-nong Thai
-
-### What's not done yet
-- The seed script has not been run successfully yet. It looks up the venue by name `"Pie-nong Thai"` — **verify the exact venue name in the DB** (`npm run db:studio`) and update the `VENUE_NAME` constant in the script if needed, then run `npx tsx scripts/seed-menu.ts`
-- Home page `+page.server.ts` load function needs updating: when venue is locked, check `venue_menu_items` for that venue and pass grouped menu data to the page
-- Home page `+page.svelte` needs a menu picker UI (category accordion + protein chips) that replaces the free-form meal input when a venue with menu items is locked. Free-form + notes field should remain as fallback for venues without a menu
-- `saveOrder` action needs updating to accept `menuItemId` and `notes` (schema already supports both; `meal` should be auto-populated as a display string e.g. `"Tom Yam #9 — shrimps — €8.50"`)
-
-### Menu picker UI spec (from `MENU-PLAN.md`)
-- Categories as collapsible rows (collapsed by default)
-- Each dish shows: menu number, name, description
-- Protein versions as tappable chips showing protein + price
-- Tapping a chip selects it; selected item shown in a confirmation row at the bottom
-- Notes textarea below the selection (shown for both menu and free-form orders)
-- Previously saved order is pre-selected on page load (requires fetching `menuItemId` for current user's order in the load function)
+### What's in place
+- `venue_menu_items` table seeded with 109 Pie-nong Thai items (via `scripts/seed-menu.ts`)
+- `food_orders.menu_item_id` (nullable FK, `ON DELETE SET NULL`) and `food_orders.notes` columns in use
+- `+page.server.ts` loads `venueMenuItems` for the locked venue and returns `menuByCategory` (grouped by category) and `hasMenu` flag
+- `saveOrder` action accepts `meal`, `menuItemId`, and `notes`
+- Menu picker UI in `+page.svelte`: category accordion (collapsed by default), protein chips per dish, multi-select, order summary panel, notes field, pre-selects previously saved order on load
+- Free-form text input remains as fallback for venues without menu items
 
 ---
 
