@@ -69,9 +69,18 @@ Seeded via `scripts/seed-menu.ts` (Pie-nong Thai, 109 items). Re-run the script 
 
 On the home page, when a venue with menu items is locked, the UI shows a category accordion picker instead of a free-form text input. Venues without menu items fall back to free-form. Users can select multiple items; selecting a selected item deselects it.
 
-## UI conventions (`src/routes/(app)/+page.svelte`)
+## UI conventions
 
+**Design system** (inspired by `cpc-background.png` — dark teal tropical illustration):
+- Background: `cpc-background.png` as a fixed full-screen layer (`position: fixed; z-index: -10`)
+- Cards/sections: `bg-black/60 backdrop-blur-sm border border-white/10` (frosted glass)
+- Primary action colour: **red** (`bg-red-600`) — echoes the red accent leaf
+- Section labels: **amber** (`text-amber-300 text-sm font-semibold uppercase tracking-widest`) — echoes the yellow accent leaf
+- Secondary buttons: `bg-white/10` hover `bg-white/15`; inputs: `bg-black/40 ring-white/20`
+- Nav label for venues page is **"food"** (href `/venues`)
+
+**Home page (`src/routes/(app)/+page.svelte`)**:
 - Svelte 5 runes: `$props()`, `$state()`, `$derived()`. Forms use `use:enhance`.
 - Food order section is **only shown to users who marked themselves as attending** (`data.currentUserAttending === true`). It fades in with a 0.4s slide-up animation.
-- Beer emoji 🍺 in the header uses a JS scheduler (`onMount`) to fire a CSS sip animation at random 10–20s intervals, so it never feels regular.
-- Amber (`text-amber-500/80`) is used as the accent colour for section labels to echo a beer-gold tone.
+- Beer emoji 🍺 has a dark `drop-shadow` CSS filter for visibility against any background colour, and uses a JS scheduler (`onMount`) to fire a CSS sip animation at random 10–20s intervals.
+- Main buttons use `py-3.5 text-base` for comfortable mobile tap targets.
