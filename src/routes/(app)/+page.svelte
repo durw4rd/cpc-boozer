@@ -320,7 +320,17 @@
 									].join(' ')}
 								>
 									<span class="flex items-center gap-1.5">
-										{venue.name}
+										{#if venue.url}
+											<a
+												href={venue.url}
+												target="_blank"
+												rel="noopener noreferrer"
+												onclick={(e) => e.stopPropagation()}
+												class="hover:underline"
+											>{venue.name}</a>
+										{:else}
+											{venue.name}
+										{/if}
 										{#if venue.myVote}
 											<span class="text-xs text-violet-400">✓</span>
 										{/if}
