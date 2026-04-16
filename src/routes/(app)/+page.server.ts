@@ -1,0 +1,111 @@
+import { db } from '$lib/db/index';
+import { attendance, events, foodOrders, users, venueVotes, venues } from '$lib/db/schema';
+import { getNextWednesdayDate } from '$lib/utils';
+import { eq, isNull, lt } from 'drizzle-orm';
+import type { Actions, PageServerLoad } from './$types';
+
+export const load: PageServerLoad = async ({ locals }) => {
+	const dateStr = getNextWednesdayDate();
+	const currentUser = locals.user!;
+
+	// Get or create next Wednesday event
+	let event = await db.query.events.findFirst({ where: eq(events.date, dateStr) });
+	if (!event) {
+		[event] = await db.insert(events).values({ date: dateStr }).returning();
+	}
+
+	const [allUsers, attendanceRows, allVenues, voteRows, orderRows] = await Promise.all([
+		db.select({ id: users.id, name: users.name }).from(users).orderBy(users.name),
+		db.select().from(attendance).where(eq(attendance.eventId, event.id)),
+		db.select().from(venues).orderBy(venues.name),
+		db.select().from(venueVotes).where(eq(venueVotes.eventId, event.id)),
+		event.lockedVenueId
+			? db
+					.select({ userId: foodOrders.userId, meal: foodOrders.meal, userName: users.name })
+					.from(foodOrders)
+					.innerJoin(users, eq(foodOrders.userId, users.id))
+					.where(eq(foodOrders.eventId, event.id))
+			: Promise.resolve([])
+	]);
+
+	const attendanceMap = new Map(attendanceRows.map((a) => [a.userId, a.attending]));
+	const voteCounts = voteRows.reduce(
+		(acc, v) => acc.set(v.venueId, (acc.get(v.venueId) ?? 0) + 1),
+		new Map<string, number>()
+	);
+	const userVote = voteRows.find((v) => v.userId === currentUser.id)?.venueId ?? null;
+
+	return {
+		event,
+		members: allUsers.map((u) => ({
+			id: u.id,
+			name: u.name,
+			attending: attendanceMap.get(u.id) ?? null
+		})),
+		currentUserAttending: attendanceMap.get(currentUser.id) ?? null,
+		venues: allVenues.map((v) => ({
+			...v,
+			voteCount: voteCounts.get(v.id) ?? 0,
+			myVote: userVote === v.id
+		})),
+		currentUserVote: userVote,
+		lockedVenue: event.lockedVenueId
+			? (allVenues.find((v) => v.id === event.lockedVenueId) ?? null)
+			: null,
+		foodOrders: orderRows,
+		currentUserOrder: orderRows.find((o) => o.userId === currentUser.id)?.meal ?? null
+	};
+};
+
+export const actions: Actions = {
+	toggleAttendance: async ({ request, locals }) => {
+		const data = await request.formData();
+		const eventId = data.get('eventId') as string;
+		const attending = data.get('attending') === 'true';
+		await db
+			.insert(attendance)
+			.values({ eventId, userId: locals.user!.id, attending })
+			.onConflictDoUpdate({
+				target: [attendance.eventId, attendance.userId],
+				set: { attending, updatedAt: new Date() }
+			});
+	},
+
+	voteVenue: async ({ request, locals }) => {
+		const data = await request.formData();
+		const eventId = data.get('eventId') as string;
+		const venueId = data.get('venueId') as string;
+		await db
+			.insert(venueVotes)
+			.values({ eventId, venueId, userId: locals.user!.id })
+			.onConflictDoUpdate({
+				target: [venueVotes.eventId, venueVotes.userId],
+				set: { venueId }
+			});
+	},
+
+	lockVenue: async ({ request }) => {
+		const data = await request.formData();
+		const eventId = data.get('eventId') as string;
+		const venueId = data.get('venueId') as string;
+		await db
+			.update(events)
+			.set({ lockedVenueId: venueId })
+			.where(eq(events.id, eventId) && isNull(events.lockedVenueId));
+	},
+
+	saveOrder: async ({ request, locals }) => {
+		const data = await request.formData();
+		const eventId = data.get('eventId') as string;
+		const venueId = data.get('venueId') as string;
+		const meal = (data.get('meal') as string).trim();
+		if (!meal) return;
+		await db
+			.insert(foodOrders)
+			.values({ eventId, venueId, userId: locals.user!.id, meal })
+			.onConflictDoUpdate({
+				target: [foodOrders.eventId, foodOrders.userId],
+				set: { meal, venueId }
+			});
+	}
+};

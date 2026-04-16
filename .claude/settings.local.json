@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude --version)",
+      "Bash(npm list:*)",
+      "Bash(brew list:*)",
+      "Bash(brew info:*)",
+      "Read(//opt/homebrew/Cellar/**)",
+      "Read(//opt/homebrew/lib/node_modules/**)",
+      "Read(//opt/homebrew/Caskroom/claude-code/**)",
+      "Read(//opt/homebrew/Caskroom/claude-code/2.1.92/.brew/**)",
+      "Bash(npm config:*)",
+      "Bash(npm view:*)",
+      "Bash(gsd --version)",
+      "Read(//Users/michalfasanek/.claude/plugins/**)",
+      "Read(//Users/michalfasanek/.claude/**)",
+      "Bash(brew update:*)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(cat ~/.claude/marketplaces/*.json)",
+      "Bash(brew outdated:*)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d.get\\('version','?'\\), d.get\\('name','?'\\)\\)\")",
+      "Skill(gsd-update)",
+      "Bash(cat ~/.claude/hooks/*/gsd-*.js)",
+      "Bash(npm --version)",
+      "Bash(npx sv:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m 'Initial commit: full SvelteKit app scaffold:*)"
+    ]
+  }
+}
