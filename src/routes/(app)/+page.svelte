@@ -91,7 +91,7 @@
 	</div>
 
 	<!-- Attendance -->
-	<section class="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+	<section class="rounded-xl border border-white/10 bg-black/60 p-4 backdrop-blur-sm">
 		<div class="mb-3 flex items-baseline justify-between">
 			<h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-500">attendance</h2>
 			<p class="text-xs text-zinc-500">
@@ -111,7 +111,7 @@
 						'w-full rounded-lg py-2.5 text-sm font-semibold transition-colors',
 						data.currentUserAttending === true
 							? 'bg-emerald-500 text-white'
-							: 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+							: 'bg-white/10 text-zinc-400 hover:bg-white/15'
 					].join(' ')}
 				>
 					I'm in
@@ -125,7 +125,7 @@
 						'w-full rounded-lg py-2.5 text-sm font-semibold transition-colors',
 						data.currentUserAttending === false
 							? 'bg-zinc-600 text-zinc-300'
-							: 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+							: 'bg-white/10 text-zinc-400 hover:bg-white/15'
 					].join(' ')}
 				>
 					can't make it
@@ -158,7 +158,7 @@
 	{#if data.currentUserAttending === true}
 	<div class="fade-in">
 		<p class="mb-2 text-xs font-medium uppercase tracking-widest text-amber-500/80">Joining for the dinner too?</p>
-	<section class="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+	<section class="rounded-xl border border-white/10 bg-black/60 p-4 backdrop-blur-sm">
 		<h2 class="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-500">food order</h2>
 
 		{#if data.lockedVenue}
@@ -181,14 +181,14 @@
 						<button
 							type="button"
 							onclick={() => toggleCategory(category)}
-							class="flex w-full items-center justify-between rounded-lg bg-zinc-800 px-3 py-2 text-left text-sm font-medium text-zinc-300 hover:bg-zinc-700"
+							class="flex w-full items-center justify-between rounded-lg bg-white/10 px-3 py-2 text-left text-sm font-medium text-zinc-300 hover:bg-white/15"
 						>
 							<span>{category}</span>
 							<span class="text-xs text-zinc-500">{expandedCategories[category] ? '▲' : '▼'}</span>
 						</button>
 
 						{#if expandedCategories[category]}
-							<div class="space-y-3 rounded-lg bg-zinc-800/50 px-3 py-3">
+							<div class="space-y-3 rounded-lg bg-black/30 px-3 py-3">
 								{#each dishes as [dishName, versions]}
 									<div>
 										<p class="text-sm font-medium text-zinc-200">{dishName}</p>
@@ -203,8 +203,8 @@
 													class={[
 														'rounded-md px-2.5 py-1 text-xs font-medium transition-colors',
 														selectedItemIds.has(item.id)
-															? 'bg-violet-500 text-white'
-															: 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+															? 'bg-red-500 text-white'
+															: 'bg-white/15 text-zinc-300 hover:bg-white/20'
 													].join(' ')}
 												>
 													{item.protein} €{item.priceEur}
@@ -237,7 +237,7 @@
 					<input type="hidden" name="meal" value={selectedMeal} />
 
 					{#if selectedItems.length > 0}
-						<div class="rounded-lg bg-zinc-800 px-3 py-2.5">
+						<div class="rounded-lg bg-white/10 px-3 py-2.5">
 							<p class="mb-1 text-xs text-zinc-500">your order</p>
 							{#each selectedItems as item}
 								<div class="flex items-baseline justify-between">
@@ -253,12 +253,12 @@
 						name="notes"
 						bind:value={notesInput}
 						placeholder="notes (e.g. extra spicy)…"
-						class="w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-700 focus:ring-violet-500"
+						class="w-full rounded-lg bg-white/10 px-3 py-2 text-sm text-zinc-100 placeholder-white/30 outline-none ring-1 ring-white/20 focus:ring-red-400"
 					/>
 
 					<button
 						disabled={savingOrder || selectedItems.length === 0}
-						class="w-full rounded-lg bg-violet-600 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-40"
+						class="w-full rounded-lg bg-red-600 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-40"
 					>
 						{savingOrder ? '…' : selectedItems.length > 0 ? 'confirm order' : 'pick a dish above'}
 					</button>
@@ -293,11 +293,11 @@
 						name="meal"
 						bind:value={orderInput}
 						placeholder="your order…"
-						class="flex-1 rounded-lg bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-700 focus:ring-violet-500"
+						class="flex-1 rounded-lg bg-white/10 px-3 py-2 text-sm text-zinc-100 placeholder-white/30 outline-none ring-1 ring-white/20 focus:ring-red-400"
 					/>
 					<button
 						disabled={savingOrder || !orderInput.trim()}
-						class="rounded-lg bg-violet-600 px-3 py-2 text-sm font-semibold text-white transition-opacity disabled:opacity-40"
+						class="rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white transition-opacity disabled:opacity-40"
 					>
 						{savingOrder ? '…' : 'save'}
 					</button>
@@ -333,7 +333,7 @@
 			{:else}
 				<ul class="mb-3 space-y-2">
 					{#each data.venues as venue}
-						<li class="rounded-lg bg-zinc-800 p-3">
+						<li class="rounded-lg bg-white/10 p-3">
 							<!-- Venue name + vote count -->
 							<div class="mb-2.5 flex items-center justify-between">
 								<span class="text-sm font-medium">
@@ -361,8 +361,8 @@
 										class={[
 											'w-full rounded-md py-1.5 text-xs font-semibold transition-colors',
 											venue.myVote
-												? 'bg-violet-500 text-white'
-												: 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+												? 'bg-red-500 text-white'
+												: 'bg-white/15 text-zinc-300 hover:bg-white/20'
 										].join(' ')}
 									>
 										{venue.myVote ? '✓ voted' : 'vote'}
@@ -373,7 +373,7 @@
 										<input type="hidden" name="eventId" value={data.event.id} />
 										<input type="hidden" name="venueId" value={venue.id} />
 										<button
-											class="rounded-md bg-zinc-700 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:bg-violet-600 hover:text-white"
+											class="rounded-md bg-white/15 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:bg-red-600 hover:text-white"
 										>
 											lock
 										</button>
