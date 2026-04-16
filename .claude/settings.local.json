@@ -28,7 +28,9 @@
       "Bash(git init:*)",
       "Bash(git add:*)",
       "Bash(git commit -m 'Initial commit: full SvelteKit app scaffold:*)",
-      "Bash(git commit -m 'Apply CPC Boozers visual identity:*)"
+      "Bash(git commit -m 'Apply CPC Boozers visual identity:*)",
+      "Bash(ls /Users/michalfasanek/Code/ccp-boozer/.env*)",
+      "Bash(git commit -m 'Add attendance summary count to home page:*)"
     ]
   }
 }

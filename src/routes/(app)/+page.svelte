@@ -21,7 +21,14 @@
 
 	<!-- Attendance -->
 	<section class="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
-		<h2 class="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-500">attendance</h2>
+		<div class="mb-3 flex items-baseline justify-between">
+			<h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-500">attendance</h2>
+			<p class="text-xs text-zinc-500">
+				<span class="font-medium text-emerald-400">{data.members.filter(m => m.attending === true).length}</span> in ·
+				<span class="font-medium text-zinc-400">{data.members.filter(m => m.attending === null).length}</span> pending ·
+				<span class="font-medium text-zinc-600">{data.members.filter(m => m.attending === false).length}</span> out
+			</p>
+		</div>
 
 		<!-- Toggle for current user -->
 		<div class="mb-4 flex gap-2">
