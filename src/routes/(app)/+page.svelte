@@ -60,8 +60,11 @@
 <div class="space-y-6">
 	<!-- Event header -->
 	<div>
-		<p class="text-xs font-medium uppercase tracking-widest text-zinc-500">next up</p>
-		<h1 class="text-2xl font-bold">{formatEventDate(data.event.date)}</h1>
+		<p class="text-xs font-medium uppercase tracking-widest text-amber-500/80">Our next boozing session</p>
+		<div class="flex items-center gap-3">
+			<h1 class="text-2xl font-bold">{formatEventDate(data.event.date)}</h1>
+			<span class="beer text-2xl">🍺</span>
+		</div>
 		{#if data.event.label}
 			<p class="mt-1 text-sm text-orange-400">{data.event.label}</p>
 		{/if}
@@ -132,6 +135,8 @@
 	</section>
 
 	<!-- Food order -->
+	<div>
+		<p class="mb-2 text-xs font-medium uppercase tracking-widest text-amber-500/80">Joining for the dinner too?</p>
 	<section class="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
 		<h2 class="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-500">food order</h2>
 
@@ -361,9 +366,35 @@
 			{/if}
 		{/if}
 	</section>
+	</div>
 
 	<!-- Past events link -->
 	<div class="text-center">
 		<a href="/past" class="text-sm text-zinc-600 hover:text-zinc-400">past events →</a>
 	</div>
 </div>
+
+<style>
+	/* Beer sip: tilts back periodically as if someone's having a swig */
+	@keyframes sip {
+		0%, 70%, 100% { transform: rotate(0deg); }
+		75%           { transform: rotate(-28deg) translateY(-3px); }
+		82%           { transform: rotate(-22deg) translateY(-2px); }
+		88%           { transform: rotate(-28deg) translateY(-3px); }
+		94%           { transform: rotate(-5deg); }
+	}
+
+	/* Gentle wobble when the glass is set back down */
+	@keyframes settle {
+		94%, 100%     { transform: rotate(0deg); }
+		96%           { transform: rotate(3deg); }
+		98%           { transform: rotate(-2deg); }
+	}
+
+	.beer {
+		display: inline-block;
+		transform-origin: bottom right;
+		animation: sip 5s ease-in-out infinite, settle 5s ease-in-out infinite;
+		will-change: transform;
+	}
+</style>
