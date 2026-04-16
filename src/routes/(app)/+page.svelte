@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { onMount } from 'svelte';
 	import { formatEventDate } from '$lib/utils';
 
 	let { data } = $props();
@@ -55,6 +56,25 @@
 		}
 		return [...map.entries()];
 	}
+
+	// Beer sip animation — fires at random 10–20s intervals
+	const SIP_DURATION = 2500; // ms — must match @keyframes sip duration
+	let sipping = $state(false);
+	onMount(() => {
+		let timer: ReturnType<typeof setTimeout>;
+		function scheduleSip() {
+			const delay = 10_000 + Math.random() * 10_000;
+			timer = setTimeout(() => {
+				sipping = true;
+				setTimeout(() => {
+					sipping = false;
+					scheduleSip();
+				}, SIP_DURATION);
+			}, delay);
+		}
+		scheduleSip();
+		return () => clearTimeout(timer);
+	});
 </script>
 
 <div class="space-y-6">
@@ -67,7 +87,7 @@
 				<p class="mt-1 text-sm text-orange-400">{data.event.label}</p>
 			{/if}
 		</div>
-		<span class="beer mt-1 text-3xl">🍺</span>
+		<span class={['beer mt-1 text-3xl', sipping && 'sipping'].filter(Boolean).join(' ')}>🍺</span>
 	</div>
 
 	<!-- Attendance -->
@@ -387,24 +407,26 @@
 	}
 
 	@keyframes sip {
-		/* long rest */
-		0%, 55%  { transform: rotate(0deg); }
+		0%   { transform: rotate(0deg); }
 		/* tip up — two gulps */
-		62%      { transform: rotate(-42deg) translateY(-4px); }
-		68%      { transform: rotate(-35deg) translateY(-3px); }
-		74%      { transform: rotate(-42deg) translateY(-4px); }
-		/* set it down with a little wobble */
-		82%      { transform: rotate(0deg); }
-		86%      { transform: rotate(6deg); }
-		90%      { transform: rotate(-3deg); }
-		94%      { transform: rotate(2deg); }
-		100%     { transform: rotate(0deg); }
+		25%  { transform: rotate(-42deg) translateY(-4px); }
+		38%  { transform: rotate(-35deg) translateY(-3px); }
+		52%  { transform: rotate(-42deg) translateY(-4px); }
+		/* set it down with a wobble */
+		68%  { transform: rotate(0deg); }
+		76%  { transform: rotate(6deg); }
+		84%  { transform: rotate(-3deg); }
+		92%  { transform: rotate(2deg); }
+		100% { transform: rotate(0deg); }
 	}
 
 	.beer {
 		display: inline-block;
 		transform-origin: bottom center;
-		animation: sip 5s ease-in-out infinite;
 		will-change: transform;
+	}
+
+	.beer.sipping {
+		animation: sip 2.5s ease-in-out forwards;
 	}
 </style>
