@@ -11,7 +11,7 @@
 
 	// Menu picker state
 	// svelte-ignore state_referenced_locally
-	let selectedItemId = $state<string | null>(data.currentUserMenuItemId ?? null);
+	let selectedItemIds = $state(new Set<string>(data.currentUserMenuItemId ? [data.currentUserMenuItemId] : []));
 	// svelte-ignore state_referenced_locally
 	let notesInput = $state(data.currentUserNotes ?? '');
 	let expandedCategories = $state<Record<string, boolean>>({});
@@ -28,15 +28,20 @@
 		sortOrder: number;
 	}>);
 
-	const selectedItem = $derived(
-		selectedItemId ? allMenuItems.find((item) => item.id === selectedItemId) ?? null : null
-	);
+	const selectedItems = $derived(allMenuItems.filter((item) => selectedItemIds.has(item.id)));
 
 	const selectedMeal = $derived(
-		selectedItem
-			? `${selectedItem.dishName} #${selectedItem.menuNumber} — ${selectedItem.protein} — €${selectedItem.priceEur}`
-			: ''
+		selectedItems
+			.map((item) => `${item.dishName} #${item.menuNumber} — ${item.protein} — €${item.priceEur}`)
+			.join('\n')
 	);
+
+	function toggleItem(id: string) {
+		const next = new Set(selectedItemIds);
+		if (next.has(id)) next.delete(id);
+		else next.add(id);
+		selectedItemIds = next;
+	}
 
 	function toggleCategory(cat: string) {
 		expandedCategories = { ...expandedCategories, [cat]: !expandedCategories[cat] };
@@ -168,10 +173,10 @@
 											{#each versions as item}
 												<button
 													type="button"
-													onclick={() => selectedItemId = item.id}
+													onclick={() => toggleItem(item.id)}
 													class={[
 														'rounded-md px-2.5 py-1 text-xs font-medium transition-colors',
-														selectedItemId === item.id
+														selectedItemIds.has(item.id)
 															? 'bg-violet-500 text-white'
 															: 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
 													].join(' ')}
@@ -202,14 +207,18 @@
 				>
 					<input type="hidden" name="eventId" value={data.event.id} />
 					<input type="hidden" name="venueId" value={data.lockedVenue.id} />
-					<input type="hidden" name="menuItemId" value={selectedItemId ?? ''} />
+					<input type="hidden" name="menuItemId" value="" />
 					<input type="hidden" name="meal" value={selectedMeal} />
 
-					{#if selectedItem}
+					{#if selectedItems.length > 0}
 						<div class="rounded-lg bg-zinc-800 px-3 py-2.5">
-							<p class="text-xs text-zinc-500">your order</p>
-							<p class="mt-0.5 text-sm font-medium text-zinc-100">{selectedItem.dishName}</p>
-							<p class="text-xs text-zinc-400">#{selectedItem.menuNumber} · {selectedItem.protein} · €{selectedItem.priceEur}</p>
+							<p class="mb-1 text-xs text-zinc-500">your order</p>
+							{#each selectedItems as item}
+								<div class="flex items-baseline justify-between">
+									<p class="text-sm font-medium text-zinc-100">{item.dishName}</p>
+									<p class="text-xs text-zinc-400">{item.protein} · €{item.priceEur}</p>
+								</div>
+							{/each}
 						</div>
 					{/if}
 
@@ -222,10 +231,10 @@
 					/>
 
 					<button
-						disabled={savingOrder || !selectedItem}
+						disabled={savingOrder || selectedItems.length === 0}
 						class="w-full rounded-lg bg-violet-600 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-40"
 					>
-						{savingOrder ? '…' : selectedItem ? 'confirm order' : 'pick a dish above'}
+						{savingOrder ? '…' : selectedItems.length > 0 ? 'confirm order' : 'pick a dish above'}
 					</button>
 				</form>
 			{:else}
@@ -265,9 +274,9 @@
 				<ul class="space-y-2">
 					{#each data.foodOrders as order}
 						<li class="text-sm">
-							<div class="flex items-baseline justify-between">
-								<span class="text-zinc-400">{order.userName}</span>
-								<span class="text-zinc-200">{order.meal}</span>
+							<div class="flex items-start justify-between gap-2">
+								<span class="shrink-0 text-zinc-400">{order.userName}</span>
+								<span class="text-right text-zinc-200 whitespace-pre-line">{order.meal}</span>
 							</div>
 							{#if order.notes}
 								<p class="mt-0.5 text-right text-xs text-zinc-500">{order.notes}</p>
