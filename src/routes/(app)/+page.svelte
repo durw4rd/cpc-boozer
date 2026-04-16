@@ -158,12 +158,22 @@
 											: 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
 									].join(' ')}
 								>
-									<span>{venue.name}</span>
+									<span class="flex items-center gap-1.5">
+										{venue.name}
+										{#if venue.myVote}
+											<span class="text-xs text-violet-400">✓</span>
+										{/if}
+									</span>
 									<span class={venue.myVote ? 'text-orange-400 font-semibold' : 'text-zinc-500'}>
 										{venue.voteCount}
 									</span>
 								</button>
 							</form>
+							{#if venue.url}
+								<a href={venue.url} target="_blank" rel="noopener noreferrer"
+									class="rounded-lg bg-zinc-800 px-2.5 py-2 text-xs text-zinc-500 transition-colors hover:text-zinc-300"
+									title="open menu / website">↗</a>
+							{/if}
 							{#if venue.voteCount > 0}
 								<form method="POST" action="?/lockVenue" use:enhance>
 									<input type="hidden" name="eventId" value={data.event.id} />

@@ -14,11 +14,12 @@ export const actions: Actions = {
 		const data = await request.formData();
 		const name = (data.get('name') as string).trim();
 		const description = (data.get('description') as string | null)?.trim() || null;
+		const url = (data.get('url') as string | null)?.trim() || null;
 
 		if (!name) return fail(400, { error: 'Name is required' });
 
 		try {
-			await db.insert(venues).values({ name, description, createdBy: locals.user!.id });
+			await db.insert(venues).values({ name, description, url, createdBy: locals.user!.id });
 		} catch {
 			return fail(400, { error: 'A venue with that name already exists' });
 		}
@@ -29,11 +30,12 @@ export const actions: Actions = {
 		const id = data.get('id') as string;
 		const name = (data.get('name') as string).trim();
 		const description = (data.get('description') as string | null)?.trim() || null;
+		const url = (data.get('url') as string | null)?.trim() || null;
 
 		if (!name) return fail(400, { error: 'Name is required' });
 
 		try {
-			await db.update(venues).set({ name, description }).where(eq(venues.id, id));
+			await db.update(venues).set({ name, description, url }).where(eq(venues.id, id));
 		} catch {
 			return fail(400, { error: 'A venue with that name already exists' });
 		}

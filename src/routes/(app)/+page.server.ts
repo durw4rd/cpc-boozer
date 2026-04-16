@@ -1,7 +1,7 @@
 import { db } from '$lib/db/index';
 import { attendance, events, foodOrders, users, venueVotes, venues } from '$lib/db/schema';
 import { getNextWednesdayDate } from '$lib/utils';
-import { eq, isNull, lt } from 'drizzle-orm';
+import { and, eq, isNull, lt } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -75,13 +75,29 @@ export const actions: Actions = {
 		const data = await request.formData();
 		const eventId = data.get('eventId') as string;
 		const venueId = data.get('venueId') as string;
-		await db
-			.insert(venueVotes)
-			.values({ eventId, venueId, userId: locals.user!.id })
-			.onConflictDoUpdate({
-				target: [venueVotes.eventId, venueVotes.userId],
-				set: { venueId }
-			});
+		const userId = locals.user!.id;
+
+		const existing = await db
+			.select({ venueId: venueVotes.venueId })
+			.from(venueVotes)
+			.where(and(eq(venueVotes.eventId, eventId), eq(venueVotes.userId, userId)))
+			.limit(1);
+
+		if (existing[0]?.venueId === venueId) {
+			// Clicking your current vote removes it
+			await db
+				.delete(venueVotes)
+				.where(and(eq(venueVotes.eventId, eventId), eq(venueVotes.userId, userId)));
+		} else {
+			// Vote for a new venue (or change from another)
+			await db
+				.insert(venueVotes)
+				.values({ eventId, venueId, userId })
+				.onConflictDoUpdate({
+					target: [venueVotes.eventId, venueVotes.userId],
+					set: { venueId }
+				});
+		}
 	},
 
 	lockVenue: async ({ request }) => {

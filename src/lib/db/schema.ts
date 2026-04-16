@@ -19,6 +19,7 @@ export const venues = pgTable('venues', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('name').notNull().unique(),
 	description: text('description'),
+	url: text('url'),
 	createdBy: uuid('created_by')
 		.notNull()
 		.references(() => users.id),
