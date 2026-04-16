@@ -31,7 +31,11 @@
       "Bash(git commit -m 'Apply CPC Boozers visual identity:*)",
       "Bash(ls /Users/michalfasanek/Code/ccp-boozer/.env*)",
       "Bash(git commit -m 'Add attendance summary count to home page:*)",
-      "Bash(git commit -m 'Venue vote toggle, URL field on venues:*)"
+      "Bash(git commit -m 'Venue vote toggle, URL field on venues:*)",
+      "Bash(npx tsx:*)",
+      "Bash(git -C /Users/michalfasanek/Code/ccp-boozer log --oneline)",
+      "Bash(git -C /Users/michalfasanek/Code/ccp-boozer add -A)",
+      "Bash(git -C /Users/michalfasanek/Code/ccp-boozer commit -m 'Add CONTEXT.md — full project handoff document:*)"
     ]
   }
 }

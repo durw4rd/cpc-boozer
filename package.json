@@ -22,10 +22,12 @@
 		"@sveltejs/vite-plugin-svelte": "^7.0.0",
 		"@tailwindcss/vite": "^4.2.2",
 		"@types/bcryptjs": "^2.4.6",
+		"dotenv": "^17.4.2",
 		"drizzle-kit": "^0.31.10",
 		"svelte": "^5.55.2",
 		"svelte-check": "^4.4.6",
 		"tailwindcss": "^4.2.2",
+		"tsx": "^4.21.0",
 		"typescript": "^6.0.2",
 		"vite": "^8.0.7"
 	},
