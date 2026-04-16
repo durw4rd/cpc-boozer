@@ -237,6 +237,15 @@
 						{savingOrder ? '…' : selectedItems.length > 0 ? 'confirm order' : 'pick a dish above'}
 					</button>
 				</form>
+
+				{#if data.currentUserOrder}
+					<form method="POST" action="?/clearOrder" use:enhance class="mt-1">
+						<input type="hidden" name="eventId" value={data.event.id} />
+						<button class="w-full text-center text-xs text-zinc-600 hover:text-zinc-400">
+							remove my order
+						</button>
+					</form>
+				{/if}
 			{:else}
 				<!-- ── Free-form fallback ── -->
 				<form

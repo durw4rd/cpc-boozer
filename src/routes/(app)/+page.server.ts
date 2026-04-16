@@ -25,7 +25,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 					.select({ userId: foodOrders.userId, meal: foodOrders.meal, userName: users.name, menuItemId: foodOrders.menuItemId, notes: foodOrders.notes })
 					.from(foodOrders)
 					.innerJoin(users, eq(foodOrders.userId, users.id))
-					.where(eq(foodOrders.eventId, event.id))
+					.where(and(eq(foodOrders.eventId, event.id), eq(foodOrders.venueId, event.lockedVenueId)))
 			: Promise.resolve([]),
 		event.lockedVenueId
 			? db.select().from(venueMenuItems).where(eq(venueMenuItems.venueId, event.lockedVenueId)).orderBy(venueMenuItems.sortOrder)
@@ -134,6 +134,14 @@ export const actions: Actions = {
 		const data = await request.formData();
 		const eventId = data.get('eventId') as string;
 		await db.update(events).set({ lockedVenueId: null }).where(eq(events.id, eventId));
+	},
+
+	clearOrder: async ({ request, locals }) => {
+		const data = await request.formData();
+		const eventId = data.get('eventId') as string;
+		await db
+			.delete(foodOrders)
+			.where(and(eq(foodOrders.eventId, eventId), eq(foodOrders.userId, locals.user!.id)));
 	},
 
 	saveOrder: async ({ request, locals }) => {
