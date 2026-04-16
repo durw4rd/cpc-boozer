@@ -21,7 +21,7 @@
 						'transition-colors hover:text-white',
 						page.url.pathname === '/venues' && 'text-red-400'
 					].filter(Boolean).join(' ')}
-				>venues</a>
+				>food</a>
 				<a
 					href="/profile"
 					class={[

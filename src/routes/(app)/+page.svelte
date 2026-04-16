@@ -81,8 +81,8 @@
 	<!-- Event header -->
 	<div class="flex items-start justify-between">
 		<div>
-			<p class="text-xs font-medium uppercase tracking-widest text-amber-500/80">Our next boozing session</p>
-			<h1 class="text-2xl font-bold">{formatEventDate(data.event.date)}</h1>
+			<p class="text-sm font-semibold uppercase tracking-widest text-amber-300">Our next boozing session</p>
+			<h1 class="text-3xl font-bold">{formatEventDate(data.event.date)}</h1>
 			{#if data.event.label}
 				<p class="mt-1 text-sm text-orange-400">{data.event.label}</p>
 			{/if}
@@ -108,7 +108,7 @@
 				<input type="hidden" name="attending" value="true" />
 				<button
 					class={[
-						'w-full rounded-lg py-2.5 text-sm font-semibold transition-colors',
+						'w-full rounded-lg py-3.5 text-base font-semibold transition-colors',
 						data.currentUserAttending === true
 							? 'bg-emerald-500 text-white'
 							: 'bg-white/10 text-zinc-400 hover:bg-white/15'
@@ -122,7 +122,7 @@
 				<input type="hidden" name="attending" value="false" />
 				<button
 					class={[
-						'w-full rounded-lg py-2.5 text-sm font-semibold transition-colors',
+						'w-full rounded-lg py-3.5 text-base font-semibold transition-colors',
 						data.currentUserAttending === false
 							? 'bg-zinc-600 text-zinc-300'
 							: 'bg-white/10 text-zinc-400 hover:bg-white/15'
@@ -157,7 +157,7 @@
 	<!-- Food order — only visible to attendees -->
 	{#if data.currentUserAttending === true}
 	<div class="fade-in">
-		<p class="mb-2 text-xs font-medium uppercase tracking-widest text-amber-500/80">Joining for the dinner too?</p>
+		<p class="mb-2 text-sm font-semibold uppercase tracking-widest text-amber-300">Joining for the dinner too?</p>
 	<section class="rounded-xl border border-white/10 bg-black/60 p-4 backdrop-blur-sm">
 		<h2 class="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-500">food order</h2>
 
@@ -392,7 +392,7 @@
 
 	<!-- Past events link -->
 	<div class="text-center">
-		<a href="/past" class="text-sm text-zinc-600 hover:text-zinc-400">past events →</a>
+		<a href="/past" class="text-base font-medium text-white/60 hover:text-white">past events →</a>
 	</div>
 </div>
 
@@ -424,6 +424,7 @@
 		display: inline-block;
 		transform-origin: bottom center;
 		will-change: transform;
+		filter: drop-shadow(0 2px 6px rgba(0,0,0,0.85));
 	}
 
 	.beer.sipping {
