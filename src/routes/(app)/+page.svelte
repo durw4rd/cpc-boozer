@@ -375,26 +375,25 @@
 </div>
 
 <style>
-	/* Beer sip: tilts back periodically as if someone's having a swig */
 	@keyframes sip {
-		0%, 70%, 100% { transform: rotate(0deg); }
-		75%           { transform: rotate(-28deg) translateY(-3px); }
-		82%           { transform: rotate(-22deg) translateY(-2px); }
-		88%           { transform: rotate(-28deg) translateY(-3px); }
-		94%           { transform: rotate(-5deg); }
-	}
-
-	/* Gentle wobble when the glass is set back down */
-	@keyframes settle {
-		94%, 100%     { transform: rotate(0deg); }
-		96%           { transform: rotate(3deg); }
-		98%           { transform: rotate(-2deg); }
+		/* long rest */
+		0%, 55%  { transform: rotate(0deg); }
+		/* tip up — two gulps */
+		62%      { transform: rotate(-42deg) translateY(-4px); }
+		68%      { transform: rotate(-35deg) translateY(-3px); }
+		74%      { transform: rotate(-42deg) translateY(-4px); }
+		/* set it down with a little wobble */
+		82%      { transform: rotate(0deg); }
+		86%      { transform: rotate(6deg); }
+		90%      { transform: rotate(-3deg); }
+		94%      { transform: rotate(2deg); }
+		100%     { transform: rotate(0deg); }
 	}
 
 	.beer {
 		display: inline-block;
-		transform-origin: bottom right;
-		animation: sip 5s ease-in-out infinite, settle 5s ease-in-out infinite;
+		transform-origin: bottom center;
+		animation: sip 5s ease-in-out infinite;
 		will-change: transform;
 	}
 </style>

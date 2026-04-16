@@ -1,10 +1,10 @@
 /** Returns the next Wednesday's date as YYYY-MM-DD. Returns today if today is Wednesday. */
 export function getNextWednesdayDate(): string {
 	const now = new Date();
-	const day = now.getDay(); // 0=Sun … 3=Wed … 6=Sat
+	const day = now.getUTCDay(); // 0=Sun … 3=Wed … 6=Sat — use UTC to match toISOString()
 	const daysUntil = (3 - day + 7) % 7;
 	const next = new Date(now);
-	next.setDate(now.getDate() + daysUntil);
+	next.setUTCDate(now.getUTCDate() + daysUntil);
 	return next.toISOString().split('T')[0];
 }
 
