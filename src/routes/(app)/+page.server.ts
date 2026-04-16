@@ -130,6 +130,12 @@ export const actions: Actions = {
 			.where(eq(events.id, eventId) && isNull(events.lockedVenueId));
 	},
 
+	unlockVenue: async ({ request }) => {
+		const data = await request.formData();
+		const eventId = data.get('eventId') as string;
+		await db.update(events).set({ lockedVenueId: null }).where(eq(events.id, eventId));
+	},
+
 	saveOrder: async ({ request, locals }) => {
 		const data = await request.formData();
 		const eventId = data.get('eventId') as string;

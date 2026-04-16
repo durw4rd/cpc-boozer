@@ -135,6 +135,10 @@
 			<div class="mb-4 flex items-center gap-2">
 				<span class="text-sm font-medium text-orange-400">{data.lockedVenue.name}</span>
 				<span class="rounded bg-amber-400/10 px-1.5 py-0.5 text-xs text-orange-400">locked</span>
+				<form method="POST" action="?/unlockVenue" use:enhance class="ml-auto">
+					<input type="hidden" name="eventId" value={data.event.id} />
+					<button class="text-xs text-zinc-600 hover:text-zinc-400">unlock</button>
+				</form>
 			</div>
 
 			{#if data.hasMenu}
@@ -258,11 +262,16 @@
 
 			<!-- Orders summary -->
 			{#if data.foodOrders.length > 0}
-				<ul class="space-y-1.5">
+				<ul class="space-y-2">
 					{#each data.foodOrders as order}
-						<li class="flex items-center justify-between text-sm">
-							<span class="text-zinc-400">{order.userName}</span>
-							<span class="text-zinc-200">{order.meal}</span>
+						<li class="text-sm">
+							<div class="flex items-baseline justify-between">
+								<span class="text-zinc-400">{order.userName}</span>
+								<span class="text-zinc-200">{order.meal}</span>
+							</div>
+							{#if order.notes}
+								<p class="mt-0.5 text-right text-xs text-zinc-500">{order.notes}</p>
+							{/if}
 						</li>
 					{/each}
 				</ul>
