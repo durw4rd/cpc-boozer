@@ -307,56 +307,53 @@
 			{:else}
 				<ul class="mb-3 space-y-2">
 					{#each data.venues as venue}
-						<li class="flex items-center gap-2">
-							<form method="POST" action="?/voteVenue" use:enhance class="flex flex-1 items-center gap-2">
-								<input type="hidden" name="eventId" value={data.event.id} />
-								<input type="hidden" name="venueId" value={venue.id} />
-								<button
-									class={[
-										'flex flex-1 items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
-										venue.myVote
-											? 'bg-violet-500/15 ring-1 ring-violet-500/40 text-zinc-100'
-											: 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
-									].join(' ')}
-								>
-									<span class="flex items-center gap-1.5">
-										{#if venue.url}
-											<a
-												href={venue.url}
-												target="_blank"
-												rel="noopener noreferrer"
-												onclick={(e) => e.stopPropagation()}
-												class="hover:underline"
-											>{venue.name}</a>
-										{:else}
-											{venue.name}
-										{/if}
-										{#if venue.myVote}
-											<span class="text-xs text-violet-400">✓</span>
-										{/if}
-									</span>
-									<span class={venue.myVote ? 'text-orange-400 font-semibold' : 'text-zinc-500'}>
-										{venue.voteCount}
-									</span>
-								</button>
-							</form>
-							{#if venue.url}
-								<a href={venue.url} target="_blank" rel="noopener noreferrer"
-									class="rounded-lg bg-zinc-800 px-2.5 py-2 text-xs text-zinc-500 transition-colors hover:text-zinc-300"
-									title="open menu / website">↗</a>
-							{/if}
-							{#if venue.voteCount > 0}
-								<form method="POST" action="?/lockVenue" use:enhance>
+						<li class="rounded-lg bg-zinc-800 p-3">
+							<!-- Venue name + vote count -->
+							<div class="mb-2.5 flex items-center justify-between">
+								<span class="text-sm font-medium">
+									{#if venue.url}
+										<a
+											href={venue.url}
+											target="_blank"
+											rel="noopener noreferrer"
+											class="text-orange-400 underline underline-offset-2 hover:text-orange-300"
+										>{venue.name} ↗</a>
+									{:else}
+										<span class="text-zinc-200">{venue.name}</span>
+									{/if}
+								</span>
+								<span class="text-sm text-zinc-500">
+									{venue.voteCount} {venue.voteCount === 1 ? 'vote' : 'votes'}
+								</span>
+							</div>
+							<!-- Actions -->
+							<div class="flex gap-2">
+								<form method="POST" action="?/voteVenue" use:enhance class="flex-1">
 									<input type="hidden" name="eventId" value={data.event.id} />
 									<input type="hidden" name="venueId" value={venue.id} />
 									<button
-										class="rounded-lg bg-zinc-800 px-2.5 py-2 text-xs text-zinc-400 transition-colors hover:bg-violet-600 hover:text-white"
-										title="lock this venue"
+										class={[
+											'w-full rounded-md py-1.5 text-xs font-semibold transition-colors',
+											venue.myVote
+												? 'bg-violet-500 text-white'
+												: 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+										].join(' ')}
 									>
-										lock
+										{venue.myVote ? '✓ voted' : 'vote'}
 									</button>
 								</form>
-							{/if}
+								{#if venue.voteCount > 0}
+									<form method="POST" action="?/lockVenue" use:enhance>
+										<input type="hidden" name="eventId" value={data.event.id} />
+										<input type="hidden" name="venueId" value={venue.id} />
+										<button
+											class="rounded-md bg-zinc-700 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:bg-violet-600 hover:text-white"
+										>
+											lock
+										</button>
+									</form>
+								{/if}
+							</div>
 						</li>
 					{/each}
 				</ul>
