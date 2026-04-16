@@ -111,4 +111,5 @@ export type Event = typeof events.$inferSelect;
 export type Venue = typeof venues.$inferSelect;
 export type Attendance = typeof attendance.$inferSelect;
 export type VenueVote = typeof venueVotes.$inferSelect;
+export type VenueMenuItem = typeof venueMenuItems.$inferSelect;
 export type FoodOrder = typeof foodOrders.$inferSelect;

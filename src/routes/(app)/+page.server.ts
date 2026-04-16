@@ -1,7 +1,8 @@
 import { db } from '$lib/db/index';
-import { attendance, events, foodOrders, users, venueVotes, venues } from '$lib/db/schema';
+import { attendance, events, foodOrders, users, venueVotes, venueMenuItems, venues } from '$lib/db/schema';
+import type { VenueMenuItem } from '$lib/db/schema';
 import { getNextWednesdayDate } from '$lib/utils';
-import { and, eq, isNull, lt } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -14,18 +15,21 @@ export const load: PageServerLoad = async ({ locals }) => {
 		[event] = await db.insert(events).values({ date: dateStr }).returning();
 	}
 
-	const [allUsers, attendanceRows, allVenues, voteRows, orderRows] = await Promise.all([
+	const [allUsers, attendanceRows, allVenues, voteRows, orderRows, menuItemRows] = await Promise.all([
 		db.select({ id: users.id, name: users.name }).from(users).orderBy(users.name),
 		db.select().from(attendance).where(eq(attendance.eventId, event.id)),
 		db.select().from(venues).orderBy(venues.name),
 		db.select().from(venueVotes).where(eq(venueVotes.eventId, event.id)),
 		event.lockedVenueId
 			? db
-					.select({ userId: foodOrders.userId, meal: foodOrders.meal, userName: users.name })
+					.select({ userId: foodOrders.userId, meal: foodOrders.meal, userName: users.name, menuItemId: foodOrders.menuItemId, notes: foodOrders.notes })
 					.from(foodOrders)
 					.innerJoin(users, eq(foodOrders.userId, users.id))
 					.where(eq(foodOrders.eventId, event.id))
-			: Promise.resolve([])
+			: Promise.resolve([]),
+		event.lockedVenueId
+			? db.select().from(venueMenuItems).where(eq(venueMenuItems.venueId, event.lockedVenueId)).orderBy(venueMenuItems.sortOrder)
+			: Promise.resolve([] as VenueMenuItem[])
 	]);
 
 	const attendanceMap = new Map(attendanceRows.map((a) => [a.userId, a.attending]));
@@ -34,6 +38,18 @@ export const load: PageServerLoad = async ({ locals }) => {
 		new Map<string, number>()
 	);
 	const userVote = voteRows.find((v) => v.userId === currentUser.id)?.venueId ?? null;
+
+	// Group menu items by category for the UI
+	const menuByCategory = menuItemRows.reduce(
+		(acc, item) => {
+			if (!acc[item.category]) acc[item.category] = [];
+			acc[item.category].push(item);
+			return acc;
+		},
+		{} as Record<string, VenueMenuItem[]>
+	);
+
+	const myOrder = orderRows.find((o) => o.userId === currentUser.id);
 
 	return {
 		event,
@@ -53,7 +69,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 			? (allVenues.find((v) => v.id === event.lockedVenueId) ?? null)
 			: null,
 		foodOrders: orderRows,
-		currentUserOrder: orderRows.find((o) => o.userId === currentUser.id)?.meal ?? null
+		currentUserOrder: myOrder?.meal ?? null,
+		currentUserMenuItemId: myOrder?.menuItemId ?? null,
+		currentUserNotes: myOrder?.notes ?? null,
+		menuByCategory,
+		hasMenu: menuItemRows.length > 0
 	};
 };
 
@@ -114,14 +134,16 @@ export const actions: Actions = {
 		const data = await request.formData();
 		const eventId = data.get('eventId') as string;
 		const venueId = data.get('venueId') as string;
+		const menuItemId = (data.get('menuItemId') as string | null) || null;
+		const notes = ((data.get('notes') as string | null) ?? '').trim() || null;
 		const meal = (data.get('meal') as string).trim();
 		if (!meal) return;
 		await db
 			.insert(foodOrders)
-			.values({ eventId, venueId, userId: locals.user!.id, meal })
+			.values({ eventId, venueId, userId: locals.user!.id, meal, menuItemId, notes })
 			.onConflictDoUpdate({
 				target: [foodOrders.eventId, foodOrders.userId],
-				set: { meal, venueId }
+				set: { meal, venueId, menuItemId, notes }
 			});
 	}
 };

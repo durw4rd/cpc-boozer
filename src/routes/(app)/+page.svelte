@@ -4,9 +4,52 @@
 
 	let { data } = $props();
 
+	// Free-form order input (fallback for venues without a menu)
 	// svelte-ignore state_referenced_locally
 	let orderInput = $state(data.currentUserOrder ?? '');
 	let savingOrder = $state(false);
+
+	// Menu picker state
+	// svelte-ignore state_referenced_locally
+	let selectedItemId = $state<string | null>(data.currentUserMenuItemId ?? null);
+	// svelte-ignore state_referenced_locally
+	let notesInput = $state(data.currentUserNotes ?? '');
+	let expandedCategories = $state<Record<string, boolean>>({});
+
+	// Flatten all menu items for lookup
+	const allMenuItems = $derived(Object.values(data.menuByCategory).flat() as Array<{
+		id: string;
+		category: string;
+		dishName: string;
+		descriptionEn: string | null;
+		menuNumber: string;
+		protein: string;
+		priceEur: string;
+		sortOrder: number;
+	}>);
+
+	const selectedItem = $derived(
+		selectedItemId ? allMenuItems.find((item) => item.id === selectedItemId) ?? null : null
+	);
+
+	const selectedMeal = $derived(
+		selectedItem
+			? `${selectedItem.dishName} #${selectedItem.menuNumber} — ${selectedItem.protein} — €${selectedItem.priceEur}`
+			: ''
+	);
+
+	function toggleCategory(cat: string) {
+		expandedCategories = { ...expandedCategories, [cat]: !expandedCategories[cat] };
+	}
+
+	function groupByDish(items: typeof allMenuItems): [string, typeof allMenuItems][] {
+		const map = new Map<string, typeof allMenuItems>();
+		for (const item of items) {
+			if (!map.has(item.dishName)) map.set(item.dishName, []);
+			map.get(item.dishName)!.push(item);
+		}
+		return [...map.entries()];
+	}
 </script>
 
 <div class="space-y-6">
@@ -88,41 +131,132 @@
 		<h2 class="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-500">food order</h2>
 
 		{#if data.lockedVenue}
-			<!-- Venue locked — show order input -->
+			<!-- Venue locked header -->
 			<div class="mb-4 flex items-center gap-2">
 				<span class="text-sm font-medium text-orange-400">{data.lockedVenue.name}</span>
 				<span class="rounded bg-amber-400/10 px-1.5 py-0.5 text-xs text-orange-400">locked</span>
 			</div>
 
-			<form
-				method="POST"
-				action="?/saveOrder"
-				use:enhance={() => {
-					savingOrder = true;
-					return async ({ update }) => {
-						await update();
-						savingOrder = false;
-					};
-				}}
-				class="mb-4 flex gap-2"
-			>
-				<input type="hidden" name="eventId" value={data.event.id} />
-				<input type="hidden" name="venueId" value={data.lockedVenue.id} />
-				<input
-					type="text"
-					name="meal"
-					bind:value={orderInput}
-					placeholder="your order…"
-					class="flex-1 rounded-lg bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-700 focus:ring-violet-500"
-				/>
-				<button
-					disabled={savingOrder || !orderInput.trim()}
-					class="rounded-lg bg-violet-600 px-3 py-2 text-sm font-semibold text-white transition-opacity disabled:opacity-40"
-				>
-					{savingOrder ? '…' : 'save'}
-				</button>
-			</form>
+			{#if data.hasMenu}
+				<!-- ── Menu picker ── -->
+				<div class="mb-4 space-y-1">
+					{#each Object.entries(data.menuByCategory) as [category, items]}
+						{@const dishes = groupByDish(items as typeof allMenuItems)}
+						<!-- Category header -->
+						<button
+							type="button"
+							onclick={() => toggleCategory(category)}
+							class="flex w-full items-center justify-between rounded-lg bg-zinc-800 px-3 py-2 text-left text-sm font-medium text-zinc-300 hover:bg-zinc-700"
+						>
+							<span>{category}</span>
+							<span class="text-xs text-zinc-500">{expandedCategories[category] ? '▲' : '▼'}</span>
+						</button>
 
+						{#if expandedCategories[category]}
+							<div class="space-y-3 rounded-lg bg-zinc-800/50 px-3 py-3">
+								{#each dishes as [dishName, versions]}
+									<div>
+										<p class="text-sm font-medium text-zinc-200">{dishName}</p>
+										{#if versions[0].descriptionEn}
+											<p class="mb-1.5 text-xs text-zinc-500">{versions[0].descriptionEn}</p>
+										{/if}
+										<div class="flex flex-wrap gap-1.5">
+											{#each versions as item}
+												<button
+													type="button"
+													onclick={() => selectedItemId = item.id}
+													class={[
+														'rounded-md px-2.5 py-1 text-xs font-medium transition-colors',
+														selectedItemId === item.id
+															? 'bg-violet-500 text-white'
+															: 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+													].join(' ')}
+												>
+													{item.protein} €{item.priceEur}
+												</button>
+											{/each}
+										</div>
+									</div>
+								{/each}
+							</div>
+						{/if}
+					{/each}
+				</div>
+
+				<!-- Order summary + save -->
+				<form
+					method="POST"
+					action="?/saveOrder"
+					use:enhance={() => {
+						savingOrder = true;
+						return async ({ update }) => {
+							await update();
+							savingOrder = false;
+						};
+					}}
+					class="mb-4 space-y-2"
+				>
+					<input type="hidden" name="eventId" value={data.event.id} />
+					<input type="hidden" name="venueId" value={data.lockedVenue.id} />
+					<input type="hidden" name="menuItemId" value={selectedItemId ?? ''} />
+					<input type="hidden" name="meal" value={selectedMeal} />
+
+					{#if selectedItem}
+						<div class="rounded-lg bg-zinc-800 px-3 py-2.5">
+							<p class="text-xs text-zinc-500">your order</p>
+							<p class="mt-0.5 text-sm font-medium text-zinc-100">{selectedItem.dishName}</p>
+							<p class="text-xs text-zinc-400">#{selectedItem.menuNumber} · {selectedItem.protein} · €{selectedItem.priceEur}</p>
+						</div>
+					{/if}
+
+					<input
+						type="text"
+						name="notes"
+						bind:value={notesInput}
+						placeholder="notes (e.g. extra spicy)…"
+						class="w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-700 focus:ring-violet-500"
+					/>
+
+					<button
+						disabled={savingOrder || !selectedItem}
+						class="w-full rounded-lg bg-violet-600 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-40"
+					>
+						{savingOrder ? '…' : selectedItem ? 'confirm order' : 'pick a dish above'}
+					</button>
+				</form>
+			{:else}
+				<!-- ── Free-form fallback ── -->
+				<form
+					method="POST"
+					action="?/saveOrder"
+					use:enhance={() => {
+						savingOrder = true;
+						return async ({ update }) => {
+							await update();
+							savingOrder = false;
+						};
+					}}
+					class="mb-4 flex gap-2"
+				>
+					<input type="hidden" name="eventId" value={data.event.id} />
+					<input type="hidden" name="venueId" value={data.lockedVenue.id} />
+					<input
+						type="text"
+						name="meal"
+						bind:value={orderInput}
+						placeholder="your order…"
+						class="flex-1 rounded-lg bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-700 focus:ring-violet-500"
+					/>
+					<button
+						disabled={savingOrder || !orderInput.trim()}
+						class="rounded-lg bg-violet-600 px-3 py-2 text-sm font-semibold text-white transition-opacity disabled:opacity-40"
+					>
+						{savingOrder ? '…' : 'save'}
+					</button>
+				</form>
+			{/if}
+
+			<!-- Orders summary -->
 			{#if data.foodOrders.length > 0}
 				<ul class="space-y-1.5">
 					{#each data.foodOrders as order}
