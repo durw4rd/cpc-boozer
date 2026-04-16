@@ -12,6 +12,7 @@ npm run db:push      # push schema changes directly to Neon DB (dev)
 npm run db:generate  # generate SQL migration files
 npm run db:migrate   # apply generated migrations
 npm run db:studio    # open Drizzle Studio (DB browser)
+npx tsx scripts/seed-menu.ts  # seed Pie-nong Thai menu items (run after db:push if schema changed)
 ```
 
 ## Environment
@@ -25,14 +26,52 @@ DATABASE_URL=postgresql://...  # Neon connection string
 
 **Stack**: SvelteKit 2 + Svelte 5 (runes mode) · Tailwind CSS v4 · Drizzle ORM · Neon (serverless PostgreSQL) · Vercel
 
-**Auth**: Custom session-based auth — no library. `src/lib/auth.ts` handles bcrypt hashing and session tokens. Sessions are stored in the `sessions` DB table. The `hooks.server.ts` validates the session cookie on every request and populates `event.locals.user`. All `(app)` routes are protected via `src/routes/(app)/+layout.server.ts`.
+**Auth**: Custom session-based auth — no library. `src/lib/auth.ts` handles bcrypt hashing and session tokens. Sessions are stored in the `sessions` DB table. `hooks.server.ts` validates the session cookie on every request and populates `event.locals.user`. All `(app)` routes are protected via `src/routes/(app)/+layout.server.ts`.
 
 **Route groups**:
 - `src/routes/(app)/` — protected routes (home, past, venues, profile); layout server redirects to `/login` if no session
 - `src/routes/login/`, `src/routes/register/`, `src/routes/logout/` — outside the group, no auth guard
 
-**Database** (`src/lib/db/schema.ts`): `users` → `sessions`, `venues`, `events` (one per Wednesday, auto-created), `attendance` (yes/no per user per event), `venue_votes` (one vote per user per event), `food_orders` (one meal per user per event). The `events.locked_venue_id` column controls the food-order phase: null = voting open, set = meal input open.
+## Database schema (`src/lib/db/schema.ts`)
 
-**Key data flow on home page** (`src/routes/(app)/+page.server.ts`): the load function calls `getNextWednesdayDate()` (from `src/lib/utils.ts`), upserts the event row if missing, then fetches all users + attendance + venues + votes + food orders in one `Promise.all`. Actions (`toggleAttendance`, `voteVenue`, `lockVenue`, `saveOrder`) all use Drizzle upserts with `onConflictDoUpdate`.
+```
+users           → sessions
+venues          → venue_menu_items (flat dish×protein rows, seeded from JSON)
+events          (one per Wednesday, auto-created; locked_venue_id controls food-order phase)
+attendance      (yes/no per user per event; UNIQUE event+user)
+venue_votes     (one vote per user per event; UNIQUE event+user)
+food_orders     (one order per user per event; UNIQUE event+user)
+                  meal          text    — display string, auto-populated from menu item or free-form
+                  menu_item_id  uuid?   — FK → venue_menu_items ON DELETE SET NULL (null = free-form)
+                  notes         text?   — optional special requests
+```
 
-**Svelte 5 runes**: all components use `$props()`, `$state()`, `$derived()`. Forms use `use:enhance` from `$app/forms` for non-reload submissions.
+`events.locked_venue_id`: null = voting phase, set = food-ordering phase.
+
+## Home page data flow (`src/routes/(app)/+page.server.ts`)
+
+`load`:
+1. Calls `getNextWednesdayDate()` from `src/lib/utils.ts` — **uses UTC throughout** to avoid timezone drift between `getUTCDay()` and `toISOString()`
+2. Upserts the event row if missing
+3. Fetches all users, attendance, venues, votes, food orders (filtered by locked venue), and `venue_menu_items` for the locked venue in one `Promise.all`
+4. Groups menu items by category and returns `menuByCategory`, `hasMenu`, plus the current user's order state
+
+Actions: `toggleAttendance`, `voteVenue`, `lockVenue`, `unlockVenue`, `saveOrder`, `clearOrder`
+- All use Drizzle upserts with `onConflictDoUpdate` except `clearOrder` (DELETE) and `unlockVenue` (UPDATE to null)
+- `saveOrder` accepts `meal`, `menuItemId`, `notes`; multi-item orders pass `meal` as a newline-joined string and `menuItemId` as empty
+- Food orders are filtered by both `event_id` AND `venue_id` so switching venues never shows stale orders
+
+## Menu system
+
+`venue_menu_items` stores one row per dish×protein combination. Schema: `id, venue_id, category, dish_name, description_en, menu_number, protein, price_eur, sort_order`.
+
+Seeded via `scripts/seed-menu.ts` (Pie-nong Thai, 109 items). Re-run the script to update; it clears and re-inserts. No admin UI needed.
+
+On the home page, when a venue with menu items is locked, the UI shows a category accordion picker instead of a free-form text input. Venues without menu items fall back to free-form. Users can select multiple items; selecting a selected item deselects it.
+
+## UI conventions (`src/routes/(app)/+page.svelte`)
+
+- Svelte 5 runes: `$props()`, `$state()`, `$derived()`. Forms use `use:enhance`.
+- Food order section is **only shown to users who marked themselves as attending** (`data.currentUserAttending === true`). It fades in with a 0.4s slide-up animation.
+- Beer emoji 🍺 in the header uses a JS scheduler (`onMount`) to fire a CSS sip animation at random 10–20s intervals, so it never feels regular.
+- Amber (`text-amber-500/80`) is used as the accent colour for section labels to echo a beer-gold tone.
