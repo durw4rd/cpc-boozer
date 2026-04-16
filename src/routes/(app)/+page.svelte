@@ -59,15 +59,15 @@
 
 <div class="space-y-6">
 	<!-- Event header -->
-	<div>
-		<p class="text-xs font-medium uppercase tracking-widest text-amber-500/80">Our next boozing session</p>
-		<div class="flex items-center gap-3">
+	<div class="flex items-start justify-between">
+		<div>
+			<p class="text-xs font-medium uppercase tracking-widest text-amber-500/80">Our next boozing session</p>
 			<h1 class="text-2xl font-bold">{formatEventDate(data.event.date)}</h1>
-			<span class="beer text-2xl">🍺</span>
+			{#if data.event.label}
+				<p class="mt-1 text-sm text-orange-400">{data.event.label}</p>
+			{/if}
 		</div>
-		{#if data.event.label}
-			<p class="mt-1 text-sm text-orange-400">{data.event.label}</p>
-		{/if}
+		<span class="beer mt-1 text-3xl">🍺</span>
 	</div>
 
 	<!-- Attendance -->
@@ -134,8 +134,9 @@
 		</ul>
 	</section>
 
-	<!-- Food order -->
-	<div>
+	<!-- Food order — only visible to attendees -->
+	{#if data.currentUserAttending === true}
+	<div class="fade-in">
 		<p class="mb-2 text-xs font-medium uppercase tracking-widest text-amber-500/80">Joining for the dinner too?</p>
 	<section class="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
 		<h2 class="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-500">food order</h2>
@@ -367,6 +368,7 @@
 		{/if}
 	</section>
 	</div>
+	{/if}
 
 	<!-- Past events link -->
 	<div class="text-center">
@@ -375,6 +377,15 @@
 </div>
 
 <style>
+	@keyframes fadeSlideIn {
+		from { opacity: 0; transform: translateY(10px); }
+		to   { opacity: 1; transform: translateY(0); }
+	}
+
+	.fade-in {
+		animation: fadeSlideIn 0.4s ease-out both;
+	}
+
 	@keyframes sip {
 		/* long rest */
 		0%, 55%  { transform: rotate(0deg); }
