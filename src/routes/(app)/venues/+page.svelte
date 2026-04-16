@@ -29,19 +29,19 @@
 				name="name"
 				placeholder="name"
 				required
-				class="w-full rounded-lg bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-700 focus:ring-amber-400"
+				class="w-full rounded-lg bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-700 focus:ring-violet-500"
 			/>
 			<input
 				type="text"
 				name="description"
 				placeholder="description (optional)"
-				class="w-full rounded-lg bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-700 focus:ring-amber-400"
+				class="w-full rounded-lg bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-700 focus:ring-violet-500"
 			/>
 			{#if form?.error}
 				<p class="text-xs text-red-400">{form.error}</p>
 			{/if}
 			<button
-				class="w-full rounded-lg bg-amber-400 py-2.5 text-sm font-semibold text-zinc-950 transition-opacity hover:opacity-90"
+				class="w-full rounded-lg bg-violet-600 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
 			>
 				add
 			</button>
@@ -63,17 +63,17 @@
 								name="name"
 								bind:value={editName}
 								required
-								class="w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-zinc-100 outline-none ring-1 ring-zinc-700 focus:ring-amber-400"
+								class="w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-zinc-100 outline-none ring-1 ring-zinc-700 focus:ring-violet-500"
 							/>
 							<input
 								type="text"
 								name="description"
 								bind:value={editDescription}
 								placeholder="description (optional)"
-								class="w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-700 focus:ring-amber-400"
+								class="w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-700 focus:ring-violet-500"
 							/>
 							<div class="flex gap-2">
-								<button class="flex-1 rounded-lg bg-amber-400 py-2 text-xs font-semibold text-zinc-950">save</button>
+								<button class="flex-1 rounded-lg bg-violet-600 py-2 text-xs font-semibold text-white">save</button>
 								<button type="button" onclick={() => (editingId = null)} class="flex-1 rounded-lg bg-zinc-800 py-2 text-xs text-zinc-400">cancel</button>
 							</div>
 						</form>

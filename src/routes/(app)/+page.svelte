@@ -15,7 +15,7 @@
 		<p class="text-xs font-medium uppercase tracking-widest text-zinc-500">next up</p>
 		<h1 class="text-2xl font-bold">{formatEventDate(data.event.date)}</h1>
 		{#if data.event.label}
-			<p class="mt-1 text-sm text-amber-400">{data.event.label}</p>
+			<p class="mt-1 text-sm text-orange-400">{data.event.label}</p>
 		{/if}
 	</div>
 
@@ -83,8 +83,8 @@
 		{#if data.lockedVenue}
 			<!-- Venue locked — show order input -->
 			<div class="mb-4 flex items-center gap-2">
-				<span class="text-sm font-medium text-amber-400">{data.lockedVenue.name}</span>
-				<span class="rounded bg-amber-400/10 px-1.5 py-0.5 text-xs text-amber-400">locked</span>
+				<span class="text-sm font-medium text-orange-400">{data.lockedVenue.name}</span>
+				<span class="rounded bg-amber-400/10 px-1.5 py-0.5 text-xs text-orange-400">locked</span>
 			</div>
 
 			<form
@@ -106,11 +106,11 @@
 					name="meal"
 					bind:value={orderInput}
 					placeholder="your order…"
-					class="flex-1 rounded-lg bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-700 focus:ring-amber-400"
+					class="flex-1 rounded-lg bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-700 focus:ring-violet-500"
 				/>
 				<button
 					disabled={savingOrder || !orderInput.trim()}
-					class="rounded-lg bg-amber-400 px-3 py-2 text-sm font-semibold text-zinc-950 transition-opacity disabled:opacity-40"
+					class="rounded-lg bg-violet-600 px-3 py-2 text-sm font-semibold text-white transition-opacity disabled:opacity-40"
 				>
 					{savingOrder ? '…' : 'save'}
 				</button>
@@ -132,7 +132,7 @@
 			<!-- Venue voting -->
 			{#if data.venues.length === 0}
 				<p class="text-sm text-zinc-500">
-					no venues saved yet — <a href="/venues" class="text-amber-400 hover:underline"
+					no venues saved yet — <a href="/venues" class="text-orange-400 hover:underline"
 						>add one</a
 					>
 				</p>
@@ -147,12 +147,12 @@
 									class={[
 										'flex flex-1 items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
 										venue.myVote
-											? 'bg-amber-400/15 ring-1 ring-amber-400/40 text-zinc-100'
+											? 'bg-violet-500/15 ring-1 ring-violet-500/40 text-zinc-100'
 											: 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
 									].join(' ')}
 								>
 									<span>{venue.name}</span>
-									<span class={venue.myVote ? 'text-amber-400 font-semibold' : 'text-zinc-500'}>
+									<span class={venue.myVote ? 'text-orange-400 font-semibold' : 'text-zinc-500'}>
 										{venue.voteCount}
 									</span>
 								</button>
@@ -162,7 +162,7 @@
 									<input type="hidden" name="eventId" value={data.event.id} />
 									<input type="hidden" name="venueId" value={venue.id} />
 									<button
-										class="rounded-lg bg-zinc-800 px-2.5 py-2 text-xs text-zinc-400 transition-colors hover:bg-amber-400 hover:text-zinc-950"
+										class="rounded-lg bg-zinc-800 px-2.5 py-2 text-xs text-zinc-400 transition-colors hover:bg-violet-600 hover:text-white"
 										title="lock this venue"
 									>
 										lock

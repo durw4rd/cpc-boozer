@@ -32,7 +32,7 @@
 					<div>
 						<p class="text-sm font-medium">{formatEventDate(event.date)}</p>
 						{#if event.label}
-							<p class="text-xs text-amber-400">{event.label}</p>
+							<p class="text-xs text-orange-400">{event.label}</p>
 						{/if}
 					</div>
 					<div class="flex items-center gap-3 text-xs text-zinc-500">

@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import logo from '$lib/assets/cpc-boozers.png';
 
 	let { form } = $props();
 </script>
 
 <div class="flex min-h-screen items-center justify-center bg-zinc-950 px-4">
 	<div class="w-full max-w-sm space-y-6">
-		<div class="text-center">
-			<h1 class="text-3xl font-bold text-amber-400">boozer</h1>
-			<p class="mt-1 text-sm text-zinc-500">create your account</p>
+		<div class="flex flex-col items-center gap-3">
+			<img src={logo} alt="CPC Boozers" class="h-24 w-24 rounded-full object-cover" />
+			<p class="text-sm text-zinc-500">create your account</p>
 		</div>
 
 		<form method="POST" use:enhance class="space-y-3">
@@ -18,7 +19,7 @@
 				placeholder="your name"
 				required
 				autocomplete="username"
-				class="w-full rounded-xl bg-zinc-900 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-800 focus:ring-amber-400"
+				class="w-full rounded-xl bg-zinc-900 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-800 focus:ring-violet-500"
 			/>
 			<input
 				type="password"
@@ -26,18 +27,18 @@
 				placeholder="password (min 6 chars)"
 				required
 				autocomplete="new-password"
-				class="w-full rounded-xl bg-zinc-900 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-800 focus:ring-amber-400"
+				class="w-full rounded-xl bg-zinc-900 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-800 focus:ring-violet-500"
 			/>
 			{#if form?.error}
 				<p class="text-sm text-red-400">{form.error}</p>
 			{/if}
-			<button class="w-full rounded-xl bg-amber-400 py-3 text-sm font-bold text-zinc-950 transition-opacity hover:opacity-90">
+			<button class="w-full rounded-xl bg-violet-600 py-3 text-sm font-bold text-white transition-opacity hover:opacity-90">
 				create account
 			</button>
 		</form>
 
 		<p class="text-center text-sm text-zinc-600">
-			already have an account? <a href="/login" class="text-amber-400 hover:underline">sign in</a>
+			already have an account? <a href="/login" class="text-orange-400 hover:underline">sign in</a>
 		</p>
 	</div>
 </div>

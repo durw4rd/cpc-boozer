@@ -19,7 +19,7 @@
 				name="name"
 				value={data.user.name}
 				required
-				class="w-full rounded-lg bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 outline-none ring-1 ring-zinc-700 focus:ring-amber-400"
+				class="w-full rounded-lg bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 outline-none ring-1 ring-zinc-700 focus:ring-violet-500"
 			/>
 			{#if form?.nameError}
 				<p class="text-xs text-red-400">{form.nameError}</p>
@@ -27,7 +27,7 @@
 			{#if form?.nameSuccess}
 				<p class="text-xs text-emerald-400">name updated</p>
 			{/if}
-			<button class="w-full rounded-lg bg-amber-400 py-2.5 text-sm font-semibold text-zinc-950 hover:opacity-90">
+			<button class="w-full rounded-lg bg-violet-600 py-2.5 text-sm font-semibold text-white hover:opacity-90">
 				save
 			</button>
 		</form>
@@ -42,14 +42,14 @@
 				name="current"
 				placeholder="current password"
 				required
-				class="w-full rounded-lg bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-700 focus:ring-amber-400"
+				class="w-full rounded-lg bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-700 focus:ring-violet-500"
 			/>
 			<input
 				type="password"
 				name="next"
 				placeholder="new password"
 				required
-				class="w-full rounded-lg bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-700 focus:ring-amber-400"
+				class="w-full rounded-lg bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 outline-none ring-1 ring-zinc-700 focus:ring-violet-500"
 			/>
 			{#if form?.passwordError}
 				<p class="text-xs text-red-400">{form.passwordError}</p>
@@ -57,7 +57,7 @@
 			{#if form?.passwordSuccess}
 				<p class="text-xs text-emerald-400">password updated</p>
 			{/if}
-			<button class="w-full rounded-lg bg-amber-400 py-2.5 text-sm font-semibold text-zinc-950 hover:opacity-90">
+			<button class="w-full rounded-lg bg-violet-600 py-2.5 text-sm font-semibold text-white hover:opacity-90">
 				update
 			</button>
 		</form>
